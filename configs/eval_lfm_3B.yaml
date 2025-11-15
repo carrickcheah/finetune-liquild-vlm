@@ -5,7 +5,7 @@ model: LiquidAI/LFM2-VL-3B
 structured_generation: true
 
 # Dataset parameters
-dataset: carrick113/stanford_cars
+dataset: carrick113/cifar100
 n_samples: 100
 split: test
 

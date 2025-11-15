@@ -3,7 +3,7 @@ seed: 23
 model_name: LiquidAI/LFM2-VL-3B
 max_seq_length: 2048
 
-dataset_name:  carrick113/stanford_cars
+dataset_name:  carrick113/cifar100
 dataset_samples: 6000
 dataset_image_column: image
 dataset_label_colum: maker

@@ -125,3 +125,5 @@ CLAUDE.md
 **/fixtures/**/*.gif
 **/fixtures/**/*.bmp
 
+# Evaluation results
+evals/

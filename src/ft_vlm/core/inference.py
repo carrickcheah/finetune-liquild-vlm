@@ -122,9 +122,6 @@ def get_model_output(
         tokenize=True,
     ).to(model.device)
 
-    # print('type(inputs)', type(inputs))
-    # print('dir(inputs)', dir(inputs))
-
     outputs = model.generate(**inputs, max_new_tokens=max_new_tokens)
 
     outputs_wout_input_tokens = outputs[:, inputs["input_ids"].shape[1] :]
@@ -132,10 +129,5 @@ def get_model_output(
     output = processor.batch_decode(
         outputs_wout_input_tokens, skip_special_tokens=True
     )[0]
-
-    # # Find first complete JSON object
-    # match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', output)
-    # if match:
-    #     output = match.group()
 
     return output

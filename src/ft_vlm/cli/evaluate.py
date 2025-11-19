@@ -143,9 +143,6 @@ def evaluate(
             # Using raw model output without structured generation
             pred_class: str = get_model_output(model, processor, conversation)
 
-        # print(f"Predicted class: {pred_class}")
-        # print(f"Ground truth: {label}")
-        # print("--------------------------------")
 
         # Compare predicton vs ground truth.
         accurate_predictions += 1 if pred_class == label else 0
@@ -179,27 +176,3 @@ def main(
     print(f"Predictions saved to {output_path}")
 
 
-if __name__ == "__main__":
-    config = EvaluationConfig()
-
-    print(f"Loading dataset {config.dataset}")
-    dataset = load_dataset(
-        dataset_name=config.dataset, n_samples=config.n_samples, seed=config.seed
-    )
-    print(f"Dataset loaded successfully: {dataset.num_rows} rows")
-
-    # Naive evaluation loop without batching
-    accurate_predictions: int = 0
-    for sample in dataset:
-        print("Extracting sample image and normalized label")
-        image = sample[config.image_column]
-
-        # breakpoint()
-
-        try:
-            label = config.label_mapping[sample[config.label_column]]
-        except KeyError:
-            print("Error mapping label: ", sample[config.label_column])
-            breakpoint()
-
-        print("--------------------------------")

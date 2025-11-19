@@ -1,8 +1,8 @@
-# Why I Chose LiquidAI's Open Source Model: Privacy, Speed, and Accuracy
+# Why massive models aren't always the answer: Scaling performance on a 3B VLM
 
-Closed models are powerful, but they come with trade-offs: high token costs, privacy risks, and the latency of sending data back and forth to an API.
+In the race for AI, we often focus on 70B+ parameter models. But for real-world production (especially on edge devices), efficiency is king.
 
-I wanted an alternative. I spent the weekend experimenting with LiquidAI's open-source 3B Vision Model. The goal? To see if a local model could match the performance of big APIs without the "token fly-in-fly-out" delay.
+I spent the weekend experimenting with LiquidAI's 3B Vision Model to see just how "smart" a small model could get with the right fine-tuning strategy. I leveraged Modal for compute and LoRA for parameter-efficient fine-tuning.
 
 ---
 

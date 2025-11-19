@@ -30,7 +30,7 @@ LiquidAI's 3B vision model improved from 54% to 62% test accuracy after LoRA fin
 
 ###  Fine-tuned full dataset
 
-The model achieved near-perfect training accuracy (99.98%) on the full CIFAR-100 dataset with 50,000 images. The loss dropped from ~3.45 to 0.0006 over 3 epochs, showing excellent convergence. Now lets run evaluation on the held-out test set to measure true generalization performance. 
+Spent approximate 4 hours, the model achieved near-perfect training accuracy (99.98%) on the full CIFAR-100 dataset with 50,000 images. The loss dropped from ~3.45 to 0.0006 over 3 epochs, showing excellent convergence. Now lets run evaluation on the held-out test set to measure true generalization performance. 
 
 
 ![Project Banner](media/5.png) 

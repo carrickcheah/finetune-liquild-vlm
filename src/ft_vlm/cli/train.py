@@ -61,10 +61,12 @@ def fine_tune(
 
     # Initialize wandb if enabled
     if config.use_wandb:
-        # Hardcode the W&B API key directly to bypass Modal secret caching issues
-        wandb_key = "5a30d07bc013db8443dd431c36cf642bf2f15c69"
-        print(f"✅ Using hardcoded WANDB_API_KEY (length: {len(wandb_key)})")
-        print(f"    Key preview: {wandb_key[:8]}...{wandb_key[-8:]}")
+        # Get W&B API key from environment (injected by Modal secret)
+        wandb_key = os.environ.get("WANDB_API_KEY")
+        if not wandb_key:
+            raise RuntimeError("WANDB_API_KEY not found in environment. Ensure Modal secret is configured.")
+
+        print(f"✅ Found WANDB_API_KEY from environment (length: {len(wandb_key)})")
         print("🔐 Authenticating with Weights & Biases...")
 
         try:

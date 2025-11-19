@@ -63,6 +63,6 @@ def get_secrets() -> list[modal.Secret]:
     """
     Returns the Weights & Biases and HuggingFace secrets.
     """
-    wandb_secret = modal.Secret.from_name("wandb-training-nov18")  # Use the new wandb secret
+    wandb_secret = modal.Secret.from_name("wandb-training")  # Use the new wandb secret
     hf_secret = modal.Secret.from_name("huggingface-secret")
     return [wandb_secret, hf_secret]

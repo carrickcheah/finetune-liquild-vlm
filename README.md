@@ -13,7 +13,7 @@ I leveraged Modal's L40S GPUs and LoRA to fine-tune the model on CIFAR-100. Beca
 | Configuration | Value |
 |--------------|-------|
 | **Model Scale** | 3B parameters (packed into just 6GB) |
-| **LoRA Config** | Reduced trainable parameters to 4.2M (only 0.14% of the model) |
+| **LoRA Config** | Reduced trainable parameters to 4.2M  |
 | **Batch Strategy** | Batch size 4 with gradient accumulation of 4 = Effective batch size 16 |
 | **Training Volume** | ~8,400 steps over 3 epochs |
 
@@ -21,7 +21,7 @@ I leveraged Modal's L40S GPUs and LoRA to fine-tune the model on CIFAR-100. Beca
 
 ## Results: Data Efficiency vs. Scale
 
-![Project Banner](media/Picture1.png)
+![Project Banner](media/33.png)
 
 ### 1. The Efficiency Test (10% Data / 5K Images)
 
@@ -29,7 +29,7 @@ I leveraged Modal's L40S GPUs and LoRA to fine-tune the model on CIFAR-100. Beca
 - **Result**: Improved to 62% (+8 points)
 - **Insight**: Significant gains tuning just 0.14% of parameters 
 
-![Project Banner](media/2.png) 
+![Project Banner](media/22.png) 
 
 ### 2. The Scale-Up (100% Data / 50K Images)
 
@@ -41,7 +41,7 @@ I leveraged Modal's L40S GPUs and LoRA to fine-tune the model on CIFAR-100. Beca
 
 The jump from 5K to 50K samples delivered a massive **24% accuracy gain**, far exceeding expectations. It proves we can build high-performance, private AI solutions that run locally at a fraction of the cost of renting a closed model.
 
-![Project Banner](media/6.png) 
+![Project Banner](media/44.png) 
 
 ---
 

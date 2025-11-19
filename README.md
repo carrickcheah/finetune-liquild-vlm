@@ -1,4 +1,6 @@
-# Scaling Fine-Tuning: My Experiment with LiquidAI's 3B Vision Language Model
+# Scaling Fine-Tuning: My Experiment with LiquidAI's 3B Vision Language Model 
+
+![Project Banner](media/33.png) 
 
 I spent the weekend experimenting with LiquidAI's 3B Vision Model to see just how "smart" a small model could get with the right fine-tuning strategy. I leveraged Modal for compute and LoRA for parameter-efficient fine-tuning. I started with a 3B parameter vision model achieving 56% accuracy. Fine-tuned with LoRA on just 5,000 images—10% of available data. Then scaled to 50,000 samples. 
 
@@ -6,7 +8,7 @@ The question: where's the sweet spot between data efficiency and performance?
 
 The results surprised me. 📈🔥
 
-![Project Banner](media/33.png)
+
 ---
 
 ### Baseline model

@@ -3,7 +3,7 @@ Evaluates a VL model on a given dataset
 
 Steps:
 1. Download the dataset
-2. Load the model
+2. Load the model (supports both HuggingFace Hub and local checkpoint paths)
 3. Loop through the dataset and compute model outputs
 4. Compute accuracy as a binary score: 1 if the model output matches the ground truth, 0 otherwise
 """
@@ -19,13 +19,15 @@ from ft_vlm.infrastructure.modal import (
     get_retries,
     get_secrets,
     get_volume,
+    get_model_cache_volume,
 )
 from ft_vlm.evaluation.report import EvalReport  # , save_predictions_to_disk
 from ft_vlm.models.output_types import ModelOutputType, get_model_output_schema
 
-app = get_modal_app("car-maker-identification")
+volume = get_volume("cifar100-identification")
+app = get_modal_app("cifar100-identification")
 image = get_docker_image()
-volume = get_volume("cats-vs-dogs-fine-tune")
+model_cache_volume = get_model_cache_volume()
 
 
 @app.function(
@@ -35,6 +37,7 @@ volume = get_volume("cats-vs-dogs-fine-tune")
     volumes={
         # "/datasets": volume,
         "/model_checkpoints": volume,
+        "/model_cache": model_cache_volume,
     },
     secrets=get_secrets(),
     timeout=1 * 60 * 60,
@@ -55,6 +58,30 @@ def evaluate(
     """
     print(f"Starting evaluation of {config.model} on {config.dataset}")
 
+    # Debug: List available checkpoints if model path is local
+    if config.model.startswith("/model_checkpoints"):
+        import os
+        print("\n📂 Available checkpoints in /model_checkpoints:")
+        try:
+            for item in os.listdir("/model_checkpoints"):
+                print(f"  - {item}")
+                # List contents of each checkpoint directory
+                checkpoint_path = os.path.join("/model_checkpoints", item)
+                if os.path.isdir(checkpoint_path):
+                    try:
+                        contents = sorted(os.listdir(checkpoint_path))
+                        # Find all checkpoint directories
+                        checkpoints = [c for c in contents if c.startswith("checkpoint-")]
+                        if checkpoints:
+                            print(f"    Checkpoints: {checkpoints}")
+                        else:
+                            print(f"    Contents: {contents[:10]}")
+                    except Exception as e:
+                        print(f"    Error listing contents: {e}")
+        except Exception as e:
+            print(f"  Error listing checkpoints: {e}")
+        print()
+
     dataset = load_dataset(
         dataset_name=config.dataset,
         splits=[config.split],
@@ -62,7 +89,9 @@ def evaluate(
         seed=config.seed,
     )
 
-    model, processor = load_model_and_processor(model_id=config.model)
+    model, processor = load_model_and_processor(
+        model_id=config.model, base_model_id=config.base_model
+    )
 
     # Prepare evaluation report
     eval_report = EvalReport()

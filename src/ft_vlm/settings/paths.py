@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 def get_path_to_configs() -> str:
-    path = str(Path(__file__).parent.parent.parent / "configs")
+    path = str(Path(__file__).parent.parent.parent.parent / "configs")
 
     # create path if it does not exist
     Path(path).mkdir(parents=True, exist_ok=True)
@@ -11,7 +11,7 @@ def get_path_to_configs() -> str:
 
 
 def get_path_to_evals() -> str:
-    path = str(Path(__file__).parent.parent.parent / "evals")
+    path = str(Path(__file__).parent.parent.parent.parent / "evals")
 
     # create path if it does not exist
     Path(path).mkdir(parents=True, exist_ok=True)

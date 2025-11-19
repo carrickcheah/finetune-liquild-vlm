@@ -8,7 +8,7 @@ checkpoint_path: null
 
 # Dataset configuration
 dataset_name: carrick113/cifar100
-dataset_samples: 5000  # Use 5000 training samples
+dataset_samples: 50000  # Use 50000 training samples
 dataset_image_column: img
 dataset_label_colum: fine_label
 dataset_splits: ["train"]
@@ -257,7 +257,7 @@ optim: adamw_8bit
 warmup_ratio: 0.1
 weight_decay: 0.01
 logging_steps: 10
-eval_steps: 100
+eval_steps: 1000
 
 # Weights and Biases configuration
 wandb_entity: carrick1131

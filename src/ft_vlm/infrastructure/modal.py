@@ -30,8 +30,9 @@ def get_docker_image() -> modal.Image:
             "torchvision==0.23.0",
             "bitsandbytes",
         )
-        # .add_local_python_source(".")
-        .env({"HF_HOME": "/model_cache"})
+        .env({"HF_HOME": "/model_cache", "REBUILD_TIMESTAMP": "2024-11-19-hardcoded"})  # Force rebuild
+        .run_commands("mkdir -p /root")
+        .add_local_dir("src/ft_vlm", remote_path="/root/ft_vlm")
     )
 
     return docker_image
@@ -42,6 +43,13 @@ def get_volume(name: str) -> modal.Volume:
     Returns a Modal volume object for the given name.
     """
     return modal.Volume.from_name(name, create_if_missing=True)
+
+
+def get_model_cache_volume() -> modal.Volume:
+    """
+    Returns a Modal volume object for caching HuggingFace models.
+    """
+    return modal.Volume.from_name("model-cache", create_if_missing=True)
 
 
 def get_retries(max_retries: int) -> modal.Retries:
@@ -55,6 +63,6 @@ def get_secrets() -> list[modal.Secret]:
     """
     Returns the Weights & Biases and HuggingFace secrets.
     """
-    wandb_secret = modal.Secret.from_name("wandb-secret")
+    wandb_secret = modal.Secret.from_name("wandb-training-nov18")  # Use the new wandb secret
     hf_secret = modal.Secret.from_name("huggingface-secret")
     return [wandb_secret, hf_secret]

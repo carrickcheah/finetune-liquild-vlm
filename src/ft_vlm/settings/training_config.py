@@ -69,6 +69,7 @@ class FineTuningConfig(BaseSettings):
     # eval_sample_callback_enabled: bool = False
 
     # Weights and Biases configuration
+    wandb_entity: str = "carrick1131"
     wandb_project_name: str = "car-maker-identification"
     wandb_experiment_name: str | None = None
     skip_eval: bool = False
@@ -107,6 +108,7 @@ class EvaluationConfig(BaseSettings):
 
     # Model parameters
     model: str
+    base_model: Optional[str] = None  # Required for PEFT checkpoints
     structured_generation: bool
 
     # Dataset parameters

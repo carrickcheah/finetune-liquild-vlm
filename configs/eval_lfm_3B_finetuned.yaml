@@ -1,7 +1,8 @@
 seed: 23
 
-# Model parameters
-model: LiquidAI/LFM2-VL-3b
+# Model parameters - pointing to the fine-tuned checkpoint
+model: /model_checkpoints/LFM2-VL-3B-carrick113--cifar100-20251119-124322/checkpoint-8439
+base_model: LiquidAI/LFM2-VL-3B  # Base model for PEFT checkpoint
 structured_generation: true
 
 # Dataset parameters
@@ -15,23 +16,6 @@ system_prompt: |
   Respond with precision and confidence. Provide only the exact class name from the allowed list.
 
   This is an image classification task using the CIFAR-100 dataset, which contains 32x32 pixel color images across 100 diverse object categories including animals, vehicles, household items, and natural scenes.
-
-  # Few-Shot Examples
-  Here are some examples to help you understand the task:
-
-  Example 1: A small reddish-brown animal with a bushy tail and pointed ears → "fox"
-  Example 2: A small round red fruit with a stem → "apple"
-  Example 3: A vehicle with two wheels and handlebars → "bicycle"
-  Example 4: A large gray animal with a trunk → "elephant"
-  Example 5: A furry orange and black striped cat → "tiger"
-
-  # Visual Recognition Tips for Low-Resolution Images
-  - Focus on distinctive shapes and silhouettes
-  - Look for characteristic colors (orange for foxes/tigers, gray for elephants)
-  - Identify key features (wheels for vehicles, fur patterns for animals, petals for flowers)
-  - For animals: pay attention to body shape, ears, tails, and distinctive markings
-  - For vehicles: look for wheels, windows, overall shape
-  - For objects: focus on primary color and general form
 
   Your task is to identify the primary object in the given image and classify it into exactly one of the following 100 classes:
 

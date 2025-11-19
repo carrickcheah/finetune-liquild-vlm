@@ -77,42 +77,83 @@ def fix_model_type_in_config_json(model_id: str):
 
 def load_model_and_processor(
     model_id: str,
+    base_model_id: str | None = None,
 ) -> tuple[AutoModelForImageTextToText, AutoProcessor]:
     """
-    Loads a model and processor from the Hugging Face model hub.
+    Loads a model and processor from the Hugging Face model hub or local path.
+
+    Args:
+        model_id: Model identifier (HF hub path or local path)
+        base_model_id: If provided and model_id is a PEFT checkpoint, loads base model first then adapter
     """
-    # Login using HF_TOKEN from environment variables
-    hf_token = os.getenv("HF_TOKEN")
-    if hf_token:
-        print("🔐 Logging in to Hugging Face Hub...")
-        login(token=hf_token)
+    # Check if model_id is a local path
+    is_local = model_id.startswith("/") or model_id.startswith("./")
+
+    # Check if this is a PEFT checkpoint (local path without config.json)
+    is_peft_checkpoint = False
+    if is_local and base_model_id is not None:
+        is_peft_checkpoint = True
+        print(f"📦 Detected PEFT checkpoint: {model_id}")
+        print(f"📦 Will load base model: {base_model_id}")
+
+    # Login using HF_TOKEN from environment variables (only for HF hub models)
+    if not is_local or is_peft_checkpoint:
+        hf_token = os.getenv("HF_TOKEN")
+        if hf_token:
+            print("🔐 Logging in to Hugging Face Hub...")
+            login(token=hf_token)
+        else:
+            print("⚠️ No HF_TOKEN found in environment variables")
     else:
-        print("⚠️ No HF_TOKEN found in environment variables")
+        hf_token = None
+
+    # Load processor from base model if PEFT, otherwise from model_id
+    processor_source = base_model_id if is_peft_checkpoint else model_id
 
     # TODO: hack hack hack
-    try:
-        fix_model_type_in_config_json(model_id)
-    except Exception as e:
-        print(f"Warning: could not fix config.json for model {model_id}: {e}")
+    if not is_peft_checkpoint:
+        try:
+            fix_model_type_in_config_json(model_id)
+        except Exception as e:
+            print(f"Warning: could not fix config.json for model {model_id}: {e}")
 
-    print(f"📚 Loading processor from {model_id}...")
+    print(f"📚 Loading processor from {processor_source}...")
     processor = AutoProcessor.from_pretrained(
-        model_id,
+        processor_source,
         # trust_remote_code=True,
         max_image_tokens=256,
         token=hf_token,
+        local_files_only=False if is_peft_checkpoint else is_local,
     )
 
-    print(f"🧠 Loading model from {model_id}")
-    model = AutoModelForImageTextToText.from_pretrained(
-        model_id,
-        dtype="bfloat16",
-        # trust_remote_code=True,
-        device_map="auto",
-        token=hf_token,
-    )
+    # Load model
+    if is_peft_checkpoint:
+        # Load base model first
+        print(f"🧠 Loading base model from {base_model_id}...")
+        model = AutoModelForImageTextToText.from_pretrained(
+            base_model_id,
+            dtype="bfloat16",
+            device_map="auto",
+            token=hf_token,
+        )
 
-    print("\n✅ Local model loaded successfully!")
+        # Load PEFT adapter
+        print(f"🔌 Loading PEFT adapter from {model_id}...")
+        from peft import PeftModel
+        model = PeftModel.from_pretrained(model, model_id)
+        print("✅ PEFT adapter loaded successfully!")
+    else:
+        print(f"🧠 Loading model from {model_id}")
+        model = AutoModelForImageTextToText.from_pretrained(
+            model_id,
+            dtype="bfloat16",
+            # trust_remote_code=True,
+            device_map="auto",
+            token=hf_token if not is_local else None,
+            local_files_only=is_local,
+        )
+
+    print("\n✅ Model loaded successfully!")
     print(f"📖 Vocab size: {len(processor.tokenizer)}")
     # print(
     #     f"🖼️ Image processed in up to {processor.max_tiles} patches of size {processor.tile_size}"

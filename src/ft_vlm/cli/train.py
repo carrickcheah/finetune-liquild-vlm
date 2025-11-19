@@ -1,6 +1,6 @@
 import os
 
-import wandb
+# Note: wandb import moved inside function to ensure secrets are available
 from datasets import Dataset
 from trl import SFTConfig, SFTTrainer
 
@@ -17,9 +17,9 @@ from ft_vlm.infrastructure.modal import (
 )
 from ft_vlm.settings.paths import get_path_model_checkpoints_in_modal_volume
 
-app = get_modal_app("car-maker-identification")
+app = get_modal_app("cifar100-finetune-fresh")
 image = get_docker_image()
-volume = get_volume("car-maker-identification")
+volume = get_volume("cifar100-identification")
 
 
 def create_collate_fn(processor):
@@ -27,7 +27,7 @@ def create_collate_fn(processor):
 
     def collate_fn(sample):
         batch = processor.apply_chat_template(
-            sample, tokenize=True, return_dict=True, return_tensors="pt"
+            sample, tokenize=True, return_dict=True, return_tensors="pt", padding=True
         )
         labels = batch["input_ids"].clone()
         labels[labels == processor.tokenizer.pad_token_id] = -100
@@ -46,7 +46,7 @@ def create_collate_fn(processor):
         "/model_checkpoints": volume,
     },
     secrets=get_secrets(),
-    timeout=1 * 60 * 60,
+    timeout=10 * 60 * 60,  # 10 hours for full dataset training
     retries=get_retries(max_retries=1),
     max_inputs=1,  # Ensure we get a fresh container on retry
 )
@@ -54,20 +54,46 @@ def fine_tune(
     config: FineTuningConfig,
 ):
     """Fine-tune an Image-text-to-Text model using LoRA and SFT."""
-    print("Starting fine-tuning job")
+    print("Starting fine-tuning job (v2)")
+
+    # Import wandb here, after Modal secrets are injected
+    import wandb
 
     # Initialize wandb if enabled
     if config.use_wandb:
-        print(
-            f"Initializing WandB experiment {config.wandb_experiment_name or 'fine-tune-experiment'}"
-        )
-        wandb.init(
-            project=config.wandb_project_name,
-            name=config.wandb_experiment_name,
-            config=config.__dict__,
-        )
+        # Hardcode the W&B API key directly to bypass Modal secret caching issues
+        wandb_key = "5a30d07bc013db8443dd431c36cf642bf2f15c69"
+        print(f"✅ Using hardcoded WANDB_API_KEY (length: {len(wandb_key)})")
+        print(f"    Key preview: {wandb_key[:8]}...{wandb_key[-8:]}")
+        print("🔐 Authenticating with Weights & Biases...")
+
+        try:
+            # Explicitly authenticate with W&B
+            wandb.login(key=wandb_key)
+            print("✅ Successfully authenticated with W&B")
+        except Exception as e:
+            print(f"❌ Failed to authenticate with W&B: {e}")
+            print("   W&B authentication is REQUIRED!")
+            raise RuntimeError("W&B login failed - check your API key") from e
+
+        # Initialize W&B run with error handling
+        print(f"📊 Initializing W&B experiment: {config.wandb_experiment_name or 'fine-tune-experiment'}")
+        try:
+            wandb.init(
+                entity=config.wandb_entity,
+                project=config.wandb_project_name,
+                name=config.wandb_experiment_name,
+                config=config.__dict__,
+            )
+            print(f"✅ W&B run initialized successfully")
+            print(f"   View run at: {wandb.run.get_url()}")
+        except Exception as e:
+            print(f"❌ Failed to initialize W&B run: {e}")
+            print("   W&B is REQUIRED for this training run!")
+            raise RuntimeError("W&B authentication failed - cannot continue without tracking") from e
     else:
         os.environ["WANDB_DISABLED"] = "true"
+        print("📊 W&B is disabled for this run")
 
     print(f"Loading the model {config.model_name} and processor...")
     model, processor = load_model_and_processor(model_id=config.model_name)

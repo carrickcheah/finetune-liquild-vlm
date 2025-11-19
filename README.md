@@ -39,7 +39,11 @@ Spent approximate 4 hours, the model achieved near-perfect training accuracy (99
 
 ###  Evaluation 
 
-The 86% test accuracy on unseen images is a solid result. 10x more data = 24% accuracy gain (62% → 86%). The jump from 5K to 50K samples delivered massive returns—far exceeding diminishing returns expectations. The model clearly benefits from seeing more examples of each class in this 100-category task.
+86% accuracy on unseen images is a solid result! 
+
+10x more data = 24% accuracy gain (62% → 86%). The jump from 5K to 50K samples delivered massive returns—far exceeding diminishing returns expectations. 
+
+The model clearly benefits from seeing more examples of each class in this 100-category task.
 
 
 ![Project Banner](media/44.png) 
